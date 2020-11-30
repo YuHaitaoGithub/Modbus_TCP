@@ -113,7 +113,7 @@ int main(int argc, char* argv[])
 	SOCKET sClient;
 	sockaddr_in remoteAddr;
 	int nAddrlen = sizeof(remoteAddr);
-	uint8_t revData[256];
+	uint8_t revData[255];
 	while (true)
 	{
 		printf("等待连接...\n");
@@ -125,11 +125,12 @@ int main(int argc, char* argv[])
 		}
 		printf("接受到一个连接：%s \r\n", inet_ntoa(remoteAddr.sin_addr));
 
-		int ret = recv(sClient, (char*)revData, 256, 0);
+		int ret = recv(sClient, (char*)revData, 255, 0);
 		if (ret == SOCKET_ERROR)
 		{
 			cout << "接收错误" << endl;
 			memset(revData, 0, sizeof(revData));
+			closesocket(sClient);
 			continue;
 		}
 
@@ -137,6 +138,7 @@ int main(int argc, char* argv[])
 		{
 			cout << "网络中断" << endl;
 			memset(revData, 0, sizeof(revData));
+			closesocket(sClient);
 			continue;
 		}
 
@@ -144,6 +146,7 @@ int main(int argc, char* argv[])
 		{
 			cout << "数据长度不合法";
 			memset(revData, 0, sizeof(revData));
+			closesocket(sClient);
 			continue;
 		}
 
@@ -152,6 +155,7 @@ int main(int argc, char* argv[])
 		{
 			memset(revData, 0, sizeof(revData));
 			cout << "MBAP头不正确"<< endl;
+			closesocket(sClient);
 			continue;
 		}
 		int Rlen = ret;
@@ -159,8 +163,36 @@ int main(int argc, char* argv[])
 		if (Rlen != ret)
 		{
 			send(sClient, (const char*)(&revData), Rlen, 0);
+			memset(revData, 0, sizeof(revData));
 			cout << "已发送异常码" << endl;
+			closesocket(sClient);
+			continue;
 		}
+		
+		int retlen = 12;
+		if ((uint16_t)(revData[7] & 0xff) == 1 || (uint16_t)(revData[7] & 0xff) == 15)
+		{
+			uint8_t Coil[500] = {};
+			memcpy(Coil, revData, 12);
+			Coilrw(Coil, &retlen, revData);
+			send(sClient, (const char*)(&Coil), retlen, 0);
+			cout << "已发送线圈" << endl;
+			for (int i = 0; i < retlen; i++)
+			{
+				uint8_t h[5] = {};
+				dataJuage.nToHexstr(Coil[i], h, 2);
+				cout << h << " ";
+			}
+		}
+		else
+		{
+			uint8_t Register[500] = {};
+			memcpy(Register, revData, 12);
+			Regist(Register, &retlen, revData);
+			send(sClient, (const char*)(&Register), retlen, 0);
+			cout << "已发送寄存器" << endl;
+		}
+		memset(revData, 0, sizeof(revData));
 		closesocket(sClient);
 	}
 	closesocket(slisten);

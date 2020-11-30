@@ -1,92 +1,92 @@
 #include "..\include\main.h"
 
 
-void Registe(uint8_t* in_num, int* ret,uint8_t* Rdata)
+void Coilrw(uint8_t* in_num,int* retlen, uint8_t* Rdata)
 {
-	//SystemChange data;
-	//uint8_t l[10] = {};
-	//uint16_t num = 0;
-	//uint16_t num2 = 0;
+	int functionCode = in_num[7] & 0xff;
+	char *filename = "E:\\Modbus agreement\\TCP_Slave\\Coil.ini";
+	char *section = "Coil";
+	int StrAddress = ((in_num[8] & 0xff) << 8) | (in_num[9] & 0xff);
+	int RstNum = ((in_num[10] & 0xff) << 8) | (in_num[11] & 0xff);
+	int num = 0;
+	int d = RstNum % 8 == 0 ? RstNum / 8 : RstNum / 8 + 1;
+	int j = 0;
+	while (d--)
+	{
+		if (functionCode == 1)
+		{
+			in_num[(*retlen)] = 0xff & d;
+			*retlen = (*retlen) + 1;
+			for (int i = StrAddress; j < 8 && RstNum; i++, j++)
+			{
+				RstNum--;
+				char k[5] = {};
+				_itoa_s(i, k, 10);
+				num = GetPrivateProfileIntA(section, k, -1, filename);
+				in_num[*retlen] = ((0xff & num) << (j)) | in_num[*retlen];
+			}
+			*retlen = *retlen + 1;
+			if (!RstNum)break;
+			j = 0;
+			StrAddress = StrAddress + 8;
+		}
+		else
+		{
+			int len = *retlen;
+			for (int i = StrAddress; j < 8 && RstNum; i++, j++)
+			{
+				RstNum--;
+				num = (Rdata[len]>>j) & 0x01;
+				char k1[5] = {};
+				char k2[5] = {};
+				_itoa_s(i, k1, 10);
+				_itoa_s(num, k2, 10);
+				WritePrivateProfileStringA(section, k1, k2, filename);
+			}
+			++len;
+			if (!RstNum)break;
+			j = 0;
+			StrAddress = StrAddress + 8;
+		}
+	}
+	return;
+}
 
-	//for (int i = 0; i < 8; i++)
-	//{
-	//	in_num[i] = Rdata[i];
-	//}
 
-	//num2 = Rdata[7]&0xff;
-	//switch (num2)
-	//{
-	//case 1:{
-	//	cout << "输入线圈起始地址(十进制整数)" << endl;
-	//	cin >> num;
-	//	in_num[(*ret)++] = (num >> 8) & 0xff;
-	//	in_num[(*ret)++] = num & 0xff;
-
-	//	cout << "要读线圈个数（十进制整数）" << endl;
-	//	cin >> num;
-	//	in_num[(*ret)++] = (num >> 8) & 0xff;
-	//	in_num[(*ret)++] = num & 0xff;
-	//	break;
-	//}
-	//case 3:{
-	//	cout << "输入寄存器起始地址（十进制整数）" << endl;
-	//	cin >> num;
-	//	in_num[(*ret)++] = (num >> 8) & 0xff;
-	//	in_num[(*ret)++] = num & 0xff;
-
-	//	cout << "要读寄存器的个数(十进制整数)" << endl;
-	//	cin >> num;
-	//	in_num[(*ret)++] = (num >> 8) & 0xff;
-	//	in_num[(*ret)++] = num & 0xff;
-	//	break;
-	//}
-	//case 15:{
-	//	cout << "输入线圈起始地址(十进制整数)" << endl;
-	//	cin >> num;
-	//	in_num[(*ret)++] = (num >> 8) & 0xff;
-	//	in_num[(*ret)++] = num & 0xff;
-
-	//	cout << "要写入的线圈个数(十进制整数)" << endl;
-	//	cin >> num;
-	//	in_num[(*ret)++] = (num >> 8) & 0xff;
-	//	in_num[(*ret)++] = num & 0xff;
-
-	//	num = num % 8 != 0 ? num = num / 8 + 1 : num /= 8;
-	//	in_num[(*ret)++] = num & 0xff;
-	//	while (num--)
-	//	{
-	//		uint16_t i = num + 1;
-	//		printf("要写入第%d个字节的数值(十六进制)\n", i - num);
-	//		cin >> l;
-	//		in_num[(*ret)++] = 0xff & data.ChangeNum(l);
-	//		memset(l, 0, 10);
-	//	}
-	//	break;
-	//}
-	//case 16:{
-	//	cout << "输入寄存器起始地址(十进制整数)" << endl;
-	//	cin >> num;
-	//	in_num[(*ret)++] = (num >> 8) & 0xff;
-	//	in_num[(*ret)++] = num & 0xff;
-
-	//	cout << "要写入寄存器的个数(十进制整数)" << endl;
-	//	cin >> num;
-	//	in_num[(*ret)++] = (num >> 8) & 0xff;
-	//	in_num[(*ret)++] = num & 0xff;
-	//	if (num >= 2)num /= 2;
-	//	while (num--)
-	//	{
-	//		uint16_t i = num + 1;
-	//		printf("要写入第%d个寄存器的数值的高位(十六进制)\n", i - num);
-	//		cin >> l;
-	//		in_num[(*ret)++] = data.ChangeNum(l) & 0xff;
-	//		memset(l, 0, 10);
-	//		printf("要写入第%d个寄存器的数值的低位(十六进制)\n", i - num);
-	//		cin >> l;
-	//		in_num[(*ret)++] = data.ChangeNum(l) & 0xff;
-	//		memset(l, 0, 10);
-	//	}
-	//	break;
-	//}
+void Regist(uint8_t* ret_num, int* retlenth, uint8_t* Reivedata)
+{
+	int functionCode = ret_num[7] & 0xff;
+	char *filename = "E:\\Modbus agreement\\TCP_Slave\\Register.ini";
+	char *section = "register";
+	int StrAddress = ((ret_num[8] & 0xff) << 8) | (ret_num[9] & 0xff);
+	int RstNum = ((ret_num[10] & 0xff) << 8) | (ret_num[11] & 0xff);
+	int num = 0;
+	int d = RstNum * 2;
+	if (functionCode == 3)
+	{
+		ret_num[*retlenth] = 0xff & d;
+		*retlenth = (*retlenth) + 1;
+		for (int i = StrAddress; i < RstNum; i++, *retlenth = (*retlenth) + 2)
+		{
+			char k[10] = {};
+			_itoa_s(i, k, 10);
+			num = GetPrivateProfileIntA(section, k, -1, filename);
+			ret_num[*retlenth] = (0xff & (num >> 8));
+			ret_num[(*retlenth) + 1] = 0xff & num;
+		}
+	}
+	else{
+		int len = *retlenth;
+		for (int i = StrAddress; i < RstNum; i++, len = len + 2)
+		{
+			RstNum--;
+			num = ((Reivedata[len] & 0xff)<<8) | (Reivedata[len+1]&0xff);
+			char k1[5] = {};
+			char k2[5] = {};
+			_itoa_s(i, k1, 10);
+			_itoa_s(num, k2, 10);
+			WritePrivateProfileStringA(section, k1, k2, filename);
+		}
+	}
 	return;
 }
