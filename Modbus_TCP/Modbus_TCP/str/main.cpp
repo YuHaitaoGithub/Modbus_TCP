@@ -124,77 +124,95 @@ int main(int argc, char* argv[])
 			continue;
 		}
 		printf("接受到一个连接：%s \r\n", inet_ntoa(remoteAddr.sin_addr));
-
-		int ret = recv(sClient, (char*)revData, 255, 0);
-		if (ret == SOCKET_ERROR)
+		for (;;)
 		{
-			cout << "接收错误" << endl;
-			memset(revData, 0, sizeof(revData));
-			closesocket(sClient);
-			continue;
-		}
-
-		if (ret == 0)
-		{
-			cout << "网络中断" << endl;
-			memset(revData, 0, sizeof(revData));
-			closesocket(sClient);
-			continue;
-		}
-
-		if (ret < 12)
-		{
-			cout << "数据长度不合法";
-			memset(revData, 0, sizeof(revData));
-			closesocket(sClient);
-			continue;
-		}
-
-		SystemChange dataJuage;
-		if (!dataJuage.MBAPhead_Juage(revData, ret))
-		{
-			memset(revData, 0, sizeof(revData));
-			cout << "MBAP头不正确"<< endl;
-			closesocket(sClient);
-			continue;
-		}
-		int Rlen = ret;
-		DataJuage(revData, &Rlen);
-		if (Rlen != ret)
-		{
-			send(sClient, (const char*)(&revData), Rlen, 0);
-			memset(revData, 0, sizeof(revData));
-			cout << "已发送异常码" << endl;
-			closesocket(sClient);
-			continue;
-		}
-		
-		int retlen = 12;
-		if ((uint16_t)(revData[7] & 0xff) == 1 || (uint16_t)(revData[7] & 0xff) == 15)
-		{
-			uint8_t Coil[500] = {};
-			memcpy(Coil, revData, 12);
-			Coilrw(Coil, &retlen, revData);
-			send(sClient, (const char*)(&Coil), retlen, 0);
-			cout << "已发送线圈" << endl;
-			for (int i = 0; i < retlen; i++)
+			if (sClient == NULL)
 			{
-				uint8_t h[5] = {};
-				dataJuage.nToHexstr(Coil[i], h, 2);
-				cout << h << " ";
+				closesocket(sClient);
+				break;
 			}
+			int ret = recv(sClient, (char*)revData, 255, 0);
+			if (ret == SOCKET_ERROR)
+			{
+				cout << "接收错误" << endl;
+				memset(revData, 0, sizeof(revData));
+				//closesocket(sClient);
+				continue;
+			}
+
+			if (ret == 0)
+			{
+				cout << "网络中断" << endl;
+				memset(revData, 0, sizeof(revData));
+				//closesocket(sClient);
+				break;
+			}
+
+			if (ret < 12)
+			{
+				cout << "数据长度不合法" << endl;
+				memset(revData, 0, sizeof(revData));
+				//closesocket(sClient);
+				continue;
+			}
+
+			SystemChange dataJuage;
+			if (!dataJuage.MBAPhead_Juage(revData, ret))
+			{
+				memset(revData, 0, sizeof(revData));
+				cout << "MBAP头不正确" << endl;
+				//closesocket(sClient);
+				continue;
+			}
+			int Rlen = ret;
+			DataJuage(revData, &Rlen);
+			if (Rlen != ret)
+			{
+				send(sClient, (const char*)(&revData), Rlen, 0);
+				memset(revData, 0, sizeof(revData));
+				cout << "已发送异常码" << endl;
+				//closesocket(sClient);
+				continue;
+			}
+
+			int retlen = 12;
+			if ((uint16_t)(revData[7] & 0xff) == 1 || (uint16_t)(revData[7] & 0xff) == 15)
+			{
+				uint8_t Coil[500] = {};
+				memcpy(Coil, revData, 12);
+				Coilrw(Coil, &retlen, revData);
+				send(sClient, (const char*)(&Coil), retlen, 0);
+				cout << "已发送线圈" << endl;
+				for (int i = 0; i < retlen; i++)
+				{
+					uint8_t h[5] = {};
+					dataJuage.nToHexstr(Coil[i], h, 2);
+					cout << h << " ";
+				}
+				memset(Coil, 0, sizeof(Coil));
+				cout << endl;
+			}
+			else
+			{
+				uint8_t Register[500] = {};
+				memcpy(Register, revData, 12);
+				Regist(Register, &retlen, revData);
+				send(sClient, (const char*)(&Register), retlen, 0);
+				cout << "已发送寄存器" << endl;
+				for (int i = 0; i < retlen; i++)
+				{
+					uint8_t h[5] = {};
+					dataJuage.nToHexstr(Register[i], h, 2);
+					cout << h << " ";
+				}
+				memset(Register, 0, sizeof(Register));
+				cout << endl;
+			}
+			memset(revData, 0, sizeof(revData));
+		//	closesocket(sClient);
 		}
-		else
-		{
-			uint8_t Register[500] = {};
-			memcpy(Register, revData, 12);
-			Regist(Register, &retlen, revData);
-			send(sClient, (const char*)(&Register), retlen, 0);
-			cout << "已发送寄存器" << endl;
-		}
-		memset(revData, 0, sizeof(revData));
-		closesocket(sClient);
 	}
+	
 	closesocket(slisten);
 	WSACleanup();
 	return 0;
