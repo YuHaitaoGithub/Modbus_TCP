@@ -4,7 +4,7 @@
 void Coilrw(uint8_t* in_num,int* retlen, uint8_t* Rdata)
 {
 	int functionCode = in_num[7] & 0xff;
-	char *filename = "E:\\Modbus agreement\\TCP_Slave\\Coil.ini";
+	char *filename = "./Coil.ini";
 	char *section = "Coil";
 	int StrAddress = ((in_num[8] & 0xff) << 8) | (in_num[9] & 0xff);
 	int RstNum = ((in_num[10] & 0xff) << 8) | (in_num[11] & 0xff);
@@ -56,7 +56,7 @@ void Coilrw(uint8_t* in_num,int* retlen, uint8_t* Rdata)
 void Regist(uint8_t* ret_num, int* retlenth, uint8_t* Reivedata)
 {
 	int functionCode = ret_num[7] & 0xff;
-	char *filename = "E:\\Modbus agreement\\TCP_Slave\\Register.ini";
+	char *filename = "./Register.ini";
 	char *section = "register";
 	int StrAddress = ((ret_num[8] & 0xff) << 8) | (ret_num[9] & 0xff);
 	int RstNum = ((ret_num[10] & 0xff) << 8) | (ret_num[11] & 0xff);
