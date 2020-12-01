@@ -176,6 +176,7 @@ int main(int argc, char* argv[])
 			}
 
 			int retlen = 12;
+
 			if ((uint16_t)(revData[7] & 0xff) == 1 || (uint16_t)(revData[7] & 0xff) == 15)
 			{
 				uint8_t Coil[500] = {};
@@ -192,6 +193,7 @@ int main(int argc, char* argv[])
 				memset(Coil, 0, sizeof(Coil));
 				cout << endl;
 			}
+
 			else
 			{
 				uint8_t Register[500] = {};
@@ -209,7 +211,6 @@ int main(int argc, char* argv[])
 				cout << endl;
 			}
 			memset(revData, 0, sizeof(revData));
-		//	closesocket(sClient);
 		}
 	}
 	
