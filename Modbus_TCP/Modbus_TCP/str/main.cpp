@@ -65,7 +65,10 @@ void DataJuage(uint8_t* Rdata, int* Rlen)
 		}
 	}
 	else {
-		cout << "非法功能码,返回异常码01" << endl;
+		if (function >= 128)
+			cout << "功能码过大" << endl;
+		else
+			cout << "非法功能码,返回异常码01" << endl;
 		code = 1;
 		numJuage.DataEorry(Rdata, Rlen, code, function);
 		return;
@@ -102,12 +105,14 @@ int main(int argc, char* argv[])
 		printf("bind error !");
 	}
 
+
 	//开始监听
 	if (listen(slisten, 5) == SOCKET_ERROR)
 	{
 		printf("listen error !");
 		return 0;
 	}
+
 
 	//循环接收数据
 	SOCKET sClient;
@@ -132,14 +137,16 @@ int main(int argc, char* argv[])
 				break;
 			}
 			int ret = recv(sClient, (char*)revData, 255, 0);
+			/*接受错误判断********/
 			if (ret == SOCKET_ERROR)
 			{
 				cout << "接收错误" << endl;
 				memset(revData, 0, sizeof(revData));
 				//closesocket(sClient);
-				continue;
+				break;
 			}
 
+			/*网口检测**********/
 			if (ret == 0)
 			{
 				cout << "网络中断" << endl;
@@ -148,6 +155,7 @@ int main(int argc, char* argv[])
 				break;
 			}
 
+			/*长度判断***********/
 			if (ret < 12)
 			{
 				cout << "数据长度不合法" << endl;
@@ -213,7 +221,6 @@ int main(int argc, char* argv[])
 			memset(revData, 0, sizeof(revData));
 		}
 	}
-	
 	closesocket(slisten);
 	WSACleanup();
 	return 0;

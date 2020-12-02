@@ -93,9 +93,9 @@ bool SystemChange::MBAPhead_Juage(uint8_t* Rdata, int Rlen)
 void SystemChange::DataEorry(uint8_t* &Rdata, int* Rlen, uint16_t code, uint16_t function)
 {
 	int Retlen = 0;
-	function |= 0x80;
+	function += 0x80;
 	Rdata[7] = function;
-	Rdata[8] = 2;
+	Rdata[8] = code & 0xff;
 	Retlen = 9;
 	memset(Rdata + 9, 0, *Rlen - 9);
 	*Rlen = Retlen;
