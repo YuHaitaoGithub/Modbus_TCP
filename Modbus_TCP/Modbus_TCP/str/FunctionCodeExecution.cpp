@@ -11,12 +11,16 @@ void Coilrw(uint8_t* in_num,int* retlen, uint8_t* Rdata)
 	int num = 0;
 	int d = RstNum % 8 == 0 ? RstNum / 8 : RstNum / 8 + 1;
 	int j = 0;
+	if (functionCode == 1)
+	{
+		memset(in_num + 8, 0, 491);
+		in_num[8] = 0xff & d;
+		*retlen = 9;
+	}
 	while (d--)
 	{
 		if (functionCode == 1)
 		{
-			in_num[(*retlen)] = 0xff & d;
-			*retlen = (*retlen) + 1;
 			for (int i = StrAddress; j < 8 && RstNum; i++, j++)
 			{
 				RstNum--;
@@ -49,6 +53,8 @@ void Coilrw(uint8_t* in_num,int* retlen, uint8_t* Rdata)
 			StrAddress = StrAddress + 8;
 		}
 	}
+	if ((functionCode == 1)&&(in_num[8] != (*retlen) - 9))
+		cout << "线圈数据读取错误" << endl;
 	return;
 }
 
@@ -64,8 +70,9 @@ void Regist(uint8_t* ret_num, int* retlenth, uint8_t* Reivedata)
 	int d = RstNum * 2;
 	if (functionCode == 3)
 	{
-		ret_num[*retlenth] = 0xff & d;
-		*retlenth = (*retlenth) + 1;
+		memset(ret_num + 8, 0, 491);
+		ret_num[8] = 0xff & d;
+		*retlenth = 9;
 		for (int i = StrAddress; i < RstNum; i++, *retlenth = (*retlenth) + 2)
 		{
 			char k[10] = {};
@@ -74,6 +81,8 @@ void Regist(uint8_t* ret_num, int* retlenth, uint8_t* Reivedata)
 			ret_num[*retlenth] = (0xff & (num >> 8));
 			ret_num[(*retlenth) + 1] = 0xff & num;
 		}
+		if (ret_num[8] != (*retlenth) - 9)
+			cout << "寄存器数据读取错误" << endl;
 	}
 	else{
 		int len = *retlenth;

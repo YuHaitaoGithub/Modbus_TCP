@@ -118,7 +118,7 @@ int main(int argc, char* argv[])
 	SOCKET sClient;
 	sockaddr_in remoteAddr;
 	int nAddrlen = sizeof(remoteAddr);
-	uint8_t revData[255];
+	uint8_t revData[260];
 	while (true)
 	{
 		printf("等待连接...\n");
@@ -136,7 +136,7 @@ int main(int argc, char* argv[])
 				closesocket(sClient);
 				break;
 			}
-			int ret = recv(sClient, (char*)revData, 255, 0);
+			int ret = recv(sClient, (char*)revData, 260, 0);
 			/*接受错误判断********/
 			if (ret == SOCKET_ERROR)
 			{
@@ -168,10 +168,10 @@ int main(int argc, char* argv[])
 			if (!dataJuage.MBAPhead_Juage(revData, ret))
 			{
 				memset(revData, 0, sizeof(revData));
-				cout << "MBAP头不正确" << endl;
 				//closesocket(sClient);
 				continue;
 			}
+
 			int Rlen = ret;
 			DataJuage(revData, &Rlen);
 			if (Rlen != ret)
@@ -190,6 +190,8 @@ int main(int argc, char* argv[])
 				uint8_t Coil[500] = {};
 				memcpy(Coil, revData, 12);
 				Coilrw(Coil, &retlen, revData);
+				Coil[4] = ((retlen - 6) >> 8) & 0xff;
+				Coil[5] = (retlen - 6) & 0xff;
 				send(sClient, (const char*)(&Coil), retlen, 0);
 				cout << "已发送线圈" << endl;
 				for (int i = 0; i < retlen; i++)
@@ -207,6 +209,8 @@ int main(int argc, char* argv[])
 				uint8_t Register[500] = {};
 				memcpy(Register, revData, 12);
 				Regist(Register, &retlen, revData);
+				Register[4] = ((retlen - 6) >> 8) & 0xff;
+				Register[5] = (retlen - 6) & 0xff;
 				send(sClient, (const char*)(&Register), retlen, 0);
 				cout << "已发送寄存器" << endl;
 				for (int i = 0; i < retlen; i++)
