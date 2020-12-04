@@ -13,7 +13,7 @@ void DataJuage(uint8_t* Rdata, int* Rlen)
 	{
 		address = (uint16_t)(((uint16_t)((Rdata[8]) << 8)) | ((uint16_t)Rdata[9]));
 		number = (uint16_t)(((uint16_t)((Rdata[10]) << 8)) | ((uint16_t)Rdata[11]));
-		if (address > 65535)
+		if (address > 2000)
 		{
 			cout << "非法数据地址,返回异常码02" << endl;
 			code = 2;
@@ -168,7 +168,6 @@ int main(int argc, char* argv[])
 			if (!dataJuage.MBAPhead_Juage(revData, ret))
 			{
 				memset(revData, 0, sizeof(revData));
-				//closesocket(sClient);
 				continue;
 			}
 

@@ -83,7 +83,12 @@ bool SystemChange::MBAPhead_Juage(uint8_t* Rdata, int Rlen)
 	uint16_t d = ((((uint16_t)Rdata[4]) << 8) | ((uint16_t)Rdata[5]));
 	if (Rlen - 6 != d)
 	{
-		cout << "数据丢失" << endl;
+		cout << "字节数错误" << endl;
+		return false;
+	}
+	if (Rdata[6] != AddRess)
+	{
+		cout << "单元标识符错误" << endl;
 		return false;
 	}
 	return true;

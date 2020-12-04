@@ -10,6 +10,13 @@
 #include <time.h>
 #include <math.h>
 
+#define CoilFilename  "./Coil.ini"
+#define CoilSection   "Coil"
+
+#define ResFilename   "./Register.ini"
+#define ResSection    "register"
+
+
 #pragma comment(lib,"ws2_32.lib")
 
 using namespace std;

@@ -7,6 +7,9 @@
 #include "malloc.h"
 #include <iostream>
 
+#define AddRess 0xff
+
+
 using namespace std;
 
 class SystemChange{
