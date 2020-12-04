@@ -11,6 +11,7 @@ SystemChange::~SystemChange()
 
 }
 
+/*字符串转未整数*/
 uint16_t SystemChange::ChangeNum(uint8_t* str)
 {
 	int   num[16] = { 0 };
@@ -33,7 +34,7 @@ uint16_t SystemChange::ChangeNum(uint8_t* str)
 }
 
 
-
+/*字符转十六进制显示*/
 void SystemChange::nToHexstr(uint8_t n, uint8_t * hexstr, uint8_t strlen)
 {
 	uint8_t hexChar[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
@@ -49,7 +50,7 @@ void SystemChange::nToHexstr(uint8_t n, uint8_t * hexstr, uint8_t strlen)
 	hexstr[strlen] = '\0';
 }
 
-
+/*接受长度判断*/
 uint16_t SystemChange::ReceiveLenth(uint8_t* data)
 {
 	uint16_t d = 0x00ff & data[1];
@@ -72,7 +73,7 @@ uint16_t SystemChange::ReceiveLenth(uint8_t* data)
 	return d;
 }
 
-
+/*MBAP头的判断*/
 bool SystemChange::MBAPhead_Juage(uint8_t* Rdata, int Rlen)
 {
 	if (((uint16_t)Rdata[2]) | ((uint16_t)Rdata[3]) != 0)
@@ -94,7 +95,7 @@ bool SystemChange::MBAPhead_Juage(uint8_t* Rdata, int Rlen)
 	return true;
 }
 
-
+/*异常码生成*/
 void SystemChange::DataEorry(uint8_t* &Rdata, int* Rlen, uint16_t code, uint16_t function)
 {
 	int Retlen = 0;

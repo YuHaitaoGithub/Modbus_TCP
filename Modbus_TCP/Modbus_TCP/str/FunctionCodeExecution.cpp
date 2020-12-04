@@ -1,16 +1,17 @@
 #include "..\include\main.h"
 
 
+
+/*线圈返回帧的生成*/
 void Coilrw(uint8_t* in_num,int* retlen, uint8_t* Rdata)
 {
-	int functionCode = in_num[7] & 0xff;
-	//char *CoilFilename = "./Coil.ini";
-	//char *CoilSection = "Coil";
-	int StrAddress = ((in_num[8] & 0xff) << 8) | (in_num[9] & 0xff);
-	int RstNum = ((in_num[10] & 0xff) << 8) | (in_num[11] & 0xff);
+	int functionCode = in_num[7] & 0xff;//功能码
+	int StrAddress = ((in_num[8] & 0xff) << 8) | (in_num[9] & 0xff);//起始地址
+	int RstNum = ((in_num[10] & 0xff) << 8) | (in_num[11] & 0xff);//线圈个数
 	int num = 0;
 	int d = RstNum % 8 == 0 ? RstNum / 8 : RstNum / 8 + 1;
 	int j = 0;
+
 	if (functionCode == 1)
 	{
 		memset(in_num + 8, 0, 491);
@@ -20,6 +21,7 @@ void Coilrw(uint8_t* in_num,int* retlen, uint8_t* Rdata)
 	int len = *retlen + 1;
 	while (d--)
 	{
+		/*01功能码*************/
 		if (functionCode == 1)
 		{
 			for (int i = StrAddress; j < 8 && RstNum; i++, j++)
@@ -35,6 +37,7 @@ void Coilrw(uint8_t* in_num,int* retlen, uint8_t* Rdata)
 			j = 0;
 			StrAddress = StrAddress + 8;
 		}
+		/*15功能码**********/
 		else
 		{
 			for (int i = StrAddress; j < 8 && RstNum; i++, j++)
@@ -59,6 +62,7 @@ void Coilrw(uint8_t* in_num,int* retlen, uint8_t* Rdata)
 }
 
 
+/*寄存器的读写*/
 void Regist(uint8_t* ret_num, int* retlenth, uint8_t* Reivedata)
 {
 	int functionCode = ret_num[7] & 0xff;
@@ -83,7 +87,7 @@ void Regist(uint8_t* ret_num, int* retlenth, uint8_t* Reivedata)
 		if (ret_num[8] != (*retlenth) - 9)
 			cout << "寄存器数据读取错误" << endl;
 	}
-
+	/*16功能码*/
 	else{
 		int len = *retlenth + 1;
 		for (int i = StrAddress; i < RstNum + StrAddress; i++, len = len + 2)
