@@ -20,7 +20,7 @@ void DataJuage(uint8_t* Rdata, int* Rlen)
 			/*01功能码数据范围判断*/
 			if (1 == function)
 			{
-				if (number > 2000 || number < 1)
+				if (number > 2000 || number < 1 || *Rlen != 12)
 				{
 					cout << "非法数据值,返回异常码03" << endl;
 					code = 3;
@@ -38,7 +38,7 @@ void DataJuage(uint8_t* Rdata, int* Rlen)
 			}
 
 			/*03功能码数据范围判断*/
-			if (number > 125 || number < 1)
+			if (number > 125 || number < 1 || *Rlen != 12)
 			{
 				cout << "非法数据值,返回异常码03" << endl;
 				code = 3;
@@ -58,10 +58,11 @@ void DataJuage(uint8_t* Rdata, int* Rlen)
 		/*15功能码数据范围判断*/
 		if (function == 15 || function == 16)
 		{
-			Bytenum = Rdata[12] & 0xff;
+			Bytenum = (*Rlen) == 12 ? 0 : Rdata[12] & 0xff;
+			int m = number % 8 == 0 ? number / 8 : number / 8 + 1;
 			if (15 == function)
 			{
-				if (number > 1968 || number < 1 || Bytenum != (*Rlen)-13)
+				if (number > 1968 || number < 1 || Bytenum != (*Rlen) - 13 || Bytenum == 0 || m != Bytenum)
 				{
 					cout << "非法数据值,返回异常码03" << endl;
 					code = 3;
@@ -79,7 +80,8 @@ void DataJuage(uint8_t* Rdata, int* Rlen)
 			}
 
 			/*16功能码数据范围判断*/
-			if (number > 123 || number < 1 || Bytenum != (*Rlen) - 13)
+			m = number * 2;
+			if (number > 123 || number < 1 || Bytenum != (*Rlen) - 13 || Bytenum == 0 || m != Bytenum)
 			{
 				cout << "非法数据值,返回异常码03" << endl;
 				code = 3;
@@ -178,6 +180,9 @@ int main()
 		}
 		printf("接受到一个连接：%s \r\n", inet_ntoa(remoteAddr.sin_addr));
 
+		u_long mode = 0;
+		ioctlsocket(sClient, FIONBIO, &mode);
+		
 		/*把当前套接字读取完*/
 		for (;;)
 		{
@@ -186,6 +191,7 @@ int main()
 				closesocket(sClient);
 				break;
 			}
+		
 			int ret = recv(sClient, (char*)revData, 260, 0);
 
 			/*接受错误判断********/
@@ -193,6 +199,7 @@ int main()
 			{
 				cout << "接收错误" << endl;
 				memset(revData, 0, sizeof(revData));
+				closesocket(sClient);
 				break;
 			}
 
