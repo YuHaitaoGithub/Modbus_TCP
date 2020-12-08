@@ -15,31 +15,22 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="str\main.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="str\Data_Transformation.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="str\FunctionCodeExecution.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="str\MBAPjuage.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
+    <ClInclude Include="stdafx.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Data_Transformation.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="include\main.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="include\stdint.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="include\MBAPjuage.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="unittest1.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Message_Analysis.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

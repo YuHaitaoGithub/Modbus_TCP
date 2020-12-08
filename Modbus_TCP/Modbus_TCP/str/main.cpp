@@ -1,115 +1,6 @@
 #include"..\include\main.h"
 
 
-void DataJuage(uint8_t* Rdata, int* Rlen)
-{
-	SystemChange numJuage;
-	uint16_t code = 0;//异常码
-	int address = 0;//起始地址
-	int number = 0;//要判断的数据
-	int Bytenum = 0;//字节数
-	uint16_t function = ((uint16_t)Rdata[7]);//功能码
-
-	/*01异常码判断*/
-	if ((function == 1 || function == 3 || function == 15 || function == 16))
-	{
-		address = (uint16_t)(((uint16_t)((Rdata[8]) << 8)) | ((uint16_t)Rdata[9]));
-		number = (uint16_t)(((uint16_t)((Rdata[10]) << 8)) | ((uint16_t)Rdata[11]));
-		if (1 == function || 3 == function)
-		{
-			/*01功能码数据范围判断*/
-			if (1 == function)
-			{
-				if (number > 2000 || number < 1 || *Rlen != 12)
-				{
-					cout << "非法数据值,返回异常码03" << endl;
-					code = 3;
-					numJuage.DataEorry(Rdata, Rlen, code, function);
-					return;
-				}
-				if (number + address > 2500)
-				{
-					cout << "非法数据地址,返回异常码02" << endl;
-					code = 2;
-					numJuage.DataEorry(Rdata, Rlen, code, function);
-					return;
-				}
-				return;
-			}
-
-			/*03功能码数据范围判断*/
-			if (number > 125 || number < 1 || *Rlen != 12)
-			{
-				cout << "非法数据值,返回异常码03" << endl;
-				code = 3;
-				numJuage.DataEorry(Rdata, Rlen, code, function);
-				return;
-			}
-			if (number + address > 250)
-			{
-				cout << "非法数据地址,返回异常码02" << endl;
-				code = 2;
-				numJuage.DataEorry(Rdata, Rlen, code, function);
-				return;
-			}
-			return;
-		}
-
-		/*15功能码数据范围判断*/
-		if (function == 15 || function == 16)
-		{
-			Bytenum = (*Rlen) == 12 ? 0 : Rdata[12] & 0xff;
-			int m = number % 8 == 0 ? number / 8 : number / 8 + 1;
-			if (15 == function)
-			{
-				if (number > 1968 || number < 1 || Bytenum != (*Rlen) - 13 || Bytenum == 0 || m != Bytenum)
-				{
-					cout << "非法数据值,返回异常码03" << endl;
-					code = 3;
-					numJuage.DataEorry(Rdata, Rlen, code, function);
-					return;
-				}
-				if (number + address > 2500)
-				{
-					cout << "非法数据地址,返回异常码02" << endl;
-					code = 2;
-					numJuage.DataEorry(Rdata, Rlen, code, function);
-					return;
-				}
-				return;
-			}
-
-			/*16功能码数据范围判断*/
-			m = number * 2;
-			if (number > 123 || number < 1 || Bytenum != (*Rlen) - 13 || Bytenum == 0 || m != Bytenum)
-			{
-				cout << "非法数据值,返回异常码03" << endl;
-				code = 3;
-				numJuage.DataEorry(Rdata, Rlen, code, function);
-				return;
-			}
-			if (number + address > 250)
-			{
-				cout << "非法数据地址,返回异常码02" << endl;
-				code = 2;
-				numJuage.DataEorry(Rdata, Rlen, code, function);
-				return;
-			}
-			return;
-		}
-	}
-	else {
-		if (function >= 128)
-			cout << "功能码过大" << endl;
-		else
-			cout << "非法功能码,返回异常码01" << endl;
-		code = 1;
-		numJuage.DataEorry(Rdata, Rlen, code, function);
-		return;
-	}
-}
-
-
 
 int main()
 {
@@ -183,7 +74,7 @@ int main()
 		u_long mode = 0;
 		ioctlsocket(sClient, FIONBIO, &mode);
 		
-		/*把当前套接字读取完*/
+/***********把当前套接字读取完******************/
 		for (;;)
 		{
 			if (sClient == NULL)
@@ -192,43 +83,36 @@ int main()
 				break;
 			}
 		
-			int ret = recv(sClient, (char*)revData, 260, 0);
+			int ret = recv(sClient, (char*)revData, 261, 0);
 
-			/*接受错误判断********/
+/********************接受错误判断******************/
 			if (ret == SOCKET_ERROR)
 			{
-				cout << "接收错误" << endl;
+				cout << "连接中断" << endl;
 				memset(revData, 0, sizeof(revData));
 				closesocket(sClient);
 				break;
 			}
 
-			/*是否断开检测**********/
+/**************是否断开检测***********************/
 			if (ret == 0)
 			{
 				cout << "网络中断" << endl;
 				memset(revData, 0, sizeof(revData));
+				closesocket(sClient);
 				break;
 			}
-
-			/*长度判断***********/
-			if (ret < 12)
-			{
-				cout << "数据长度不合法" << endl;
-				memset(revData, 0, sizeof(revData));
-				//closesocket(sClient);
-				continue;
-			}
-
-			//报头检测
-			SystemChange dataJuage;
+			
+/****************报头检测**********************/
+			MBAPheadJuage dataJuage;
+			SystemChange changes;
 			if (!dataJuage.MBAPhead_Juage(revData, ret))
 			{
 				memset(revData, 0, sizeof(revData));
 				continue;
 			}
 
-			/*异常码检测*/
+/*************异常码检测******************************/
 			int Rlen = ret;
 			DataJuage(revData, &Rlen);
 			if (Rlen != ret)
@@ -243,7 +127,7 @@ int main()
 			int retlen = 12;
 			if ((uint16_t)(revData[7] & 0xff) == 1 || (uint16_t)(revData[7] & 0xff) == 15)
 			{
-				uint8_t Coil[500] = {};
+				uint8_t Coil[1024] = {};
 				memcpy(Coil, revData, 12);
 
 				Coilrw(Coil, &retlen, revData);
@@ -257,7 +141,7 @@ int main()
 				for (int i = 0; i < retlen; i++)
 				{
 					uint8_t h[5] = {};
-					dataJuage.nToHexstr(Coil[i], h, 2);
+					changes.nToHexstr(Coil[i], h, 2);
 					cout << h << " ";
 				}
 				memset(Coil, 0, sizeof(Coil));
@@ -267,7 +151,7 @@ int main()
 /**************寄存器读写回复*********************/
 			else
 			{
-				uint8_t Register[500] = {};
+				uint8_t Register[1024] = {};
 				memcpy(Register, revData, 12);
 
 				Regist(Register, &retlen, revData);
@@ -282,7 +166,7 @@ int main()
 				for (int i = 0; i < retlen; i++)
 				{
 					uint8_t h[5] = {};
-					dataJuage.nToHexstr(Register[i], h, 2);
+					changes.nToHexstr(Register[i], h, 2);
 					cout << h << " ";
 				}
 				memset(Register, 0, sizeof(Register));

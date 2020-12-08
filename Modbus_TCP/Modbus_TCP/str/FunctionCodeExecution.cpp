@@ -14,7 +14,7 @@ void Coilrw(uint8_t* in_num,int* retlen, uint8_t* Rdata)
 
 	if (functionCode == 1)
 	{
-		memset(in_num + 8, 0, 491);
+		memset(in_num + 8, 0, 1015);
 		in_num[8] = 0xff & d;
 		*retlen = 9;
 	}
@@ -27,7 +27,7 @@ void Coilrw(uint8_t* in_num,int* retlen, uint8_t* Rdata)
 			for (int i = StrAddress; j < 8 && RstNum; i++, j++)
 			{
 				RstNum--;
-				char k[5] = {};
+				char k[10] = {};
 				_itoa_s(i, k, 10);
 				num = GetPrivateProfileIntA(CoilSection, k, -1, CoilFilename);
 				in_num[*retlen] = ((0xff & num) << (j)) | in_num[*retlen];
@@ -56,8 +56,6 @@ void Coilrw(uint8_t* in_num,int* retlen, uint8_t* Rdata)
 			StrAddress = StrAddress + 8;
 		}
 	}
-	if ((functionCode == 1)&&(in_num[8] != (*retlen) - 9))
-		cout << "线圈数据读取错误" << endl;
 	return;
 }
 
@@ -73,7 +71,7 @@ void Regist(uint8_t* ret_num, int* retlenth, uint8_t* Reivedata)
 	/*03功能码*/
 	if (functionCode == 3)
 	{
-		memset(ret_num + 8, 0, 491);
+		memset(ret_num + 8, 0, 1015);
 		ret_num[8] = 0xff & d;
 		*retlenth = 9;
 		for (int i = StrAddress; i < RstNum + StrAddress; i++, *retlenth = (*retlenth) + 2)
@@ -84,8 +82,6 @@ void Regist(uint8_t* ret_num, int* retlenth, uint8_t* Reivedata)
 			ret_num[*retlenth] = (0xff & (num >> 8));
 			ret_num[(*retlenth) + 1] = 0xff & num;
 		}
-		if (ret_num[8] != (*retlenth) - 9)
-			cout << "寄存器数据读取错误" << endl;
 	}
 	/*16功能码*/
 	else{
@@ -101,4 +97,114 @@ void Regist(uint8_t* ret_num, int* retlenth, uint8_t* Reivedata)
 		}
 	}
 	return;
+}
+
+
+
+void DataJuage(uint8_t* Rdata, int* Rlen)
+{
+	MBAPheadJuage numJuage;
+	uint16_t code = 0;//异常码
+	int address = 0;//起始地址
+	int number = 0;//要判断的数据
+	int Bytenum = 0;//字节数
+	uint16_t function = ((uint16_t)Rdata[7]);//功能码
+
+	/*01异常码判断*/
+	if ((function == 1 || function == 3 || function == 15 || function == 16))
+	{
+		address = (uint16_t)(((uint16_t)((Rdata[8]) << 8)) | ((uint16_t)Rdata[9]));
+		number = (uint16_t)(((uint16_t)((Rdata[10]) << 8)) | ((uint16_t)Rdata[11]));
+		if (1 == function || 3 == function)
+		{
+			/*01功能码数据范围判断*/
+			if (1 == function)
+			{
+				if (number > 2000 || number < 1 || *Rlen != 12)
+				{
+					cout << "非法数据值,返回异常码03" << endl;
+					code = 3;
+					numJuage.DataEorry(Rdata, Rlen, code, function);
+					return;
+				}
+				if (number + address > 2500)
+				{
+					cout << "非法数据地址,返回异常码02" << endl;
+					code = 2;
+					numJuage.DataEorry(Rdata, Rlen, code, function);
+					return;
+				}
+				return;
+			}
+
+			/*03功能码数据范围判断*/
+			if (number > 125 || number < 1 || *Rlen != 12)
+			{
+				cout << "非法数据值,返回异常码03" << endl;
+				code = 3;
+				numJuage.DataEorry(Rdata, Rlen, code, function);
+				return;
+			}
+			if (number + address > 250)
+			{
+				cout << "非法数据地址,返回异常码02" << endl;
+				code = 2;
+				numJuage.DataEorry(Rdata, Rlen, code, function);
+				return;
+			}
+			return;
+		}
+
+		/*15功能码数据范围判断*/
+		if (function == 15 || function == 16)
+		{
+			Bytenum = (*Rlen) == 12 ? 0 : Rdata[12] & 0xff;
+			int m = number % 8 == 0 ? number / 8 : number / 8 + 1;
+			if (15 == function)
+			{
+				if (number > 1968 || number < 1 || Bytenum != (*Rlen) - 13 || Bytenum == 0 || m != Bytenum)
+				{
+					cout << "非法数据值,返回异常码03" << endl;
+					code = 3;
+					numJuage.DataEorry(Rdata, Rlen, code, function);
+					return;
+				}
+				if (number + address > 2500)
+				{
+					cout << "非法数据地址,返回异常码02" << endl;
+					code = 2;
+					numJuage.DataEorry(Rdata, Rlen, code, function);
+					return;
+				}
+				return;
+			}
+
+			/*16功能码数据范围判断*/
+			m = number * 2;
+			if (number > 123 || number < 1 || Bytenum != (*Rlen) - 13 || Bytenum == 0 || m != Bytenum)
+			{
+				cout << "非法数据值,返回异常码03" << endl;
+				code = 3;
+				numJuage.DataEorry(Rdata, Rlen, code, function);
+				return;
+			}
+			if (number + address > 250)
+			{
+				cout << "非法数据地址,返回异常码02" << endl;
+				code = 2;
+				numJuage.DataEorry(Rdata, Rlen, code, function);
+				return;
+			}
+			return;
+		}
+	}
+	else {
+		if (function >= 128)
+			cout << "功能码过大" << endl;
+		else
+			cout << "非法功能码,返回异常码01" << endl;
+		code = 1;
+		numJuage.DataEorry(Rdata, Rlen, code, function);
+		return;
+	}
 }

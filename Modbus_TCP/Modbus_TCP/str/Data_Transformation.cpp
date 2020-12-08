@@ -11,28 +11,6 @@ SystemChange::~SystemChange()
 
 }
 
-/*字符串转未整数*/
-uint16_t SystemChange::ChangeNum(uint8_t* str)
-{
-	int   num[16] = { 0 };
-	int   count = 1;
-	uint16_t   result = 0;
-	for (int i = 1; i >= 0; i--)
-	{
-		if ((str[i] >= '0') && (str[i] <= '9'))
-			num[i] = str[i] - 48;//字符0的ASCII值为48
-		else if ((str[i] >= 'a') && (str[i] <= 'f'))
-			num[i] = str[i] - 'a' + 10;
-		else if ((str[i] >= 'A') && (str[i] <= 'F'))
-			num[i] = str[i] - 'A' + 10;
-		else
-			num[i] = 0;
-		result = result + num[i] * count;
-		count = count * 16;//十六进制(如果是八进制就在这里乘以8)    
-	}
-	return result;
-}
-
 
 /*字符转十六进制显示*/
 void SystemChange::nToHexstr(uint8_t n, uint8_t * hexstr, uint8_t strlen)
@@ -50,60 +28,4 @@ void SystemChange::nToHexstr(uint8_t n, uint8_t * hexstr, uint8_t strlen)
 	hexstr[strlen] = '\0';
 }
 
-/*接受长度判断*/
-uint16_t SystemChange::ReceiveLenth(uint8_t* data)
-{
-	uint16_t d = 0x00ff & data[1];
-	switch (d)
-	{
-	case 1:{
-		d = (((data[4] & 0x00ff)<<8)| (data[5] & 0x00ff));
-		d = d % 8 == 0 ? d / 8 : d / 8 + 1;
-		d += 5;
-		break;
-	}
-	case 3:{
-		d = (((data[4] & 0x00ff) << 8) | (data[5] & 0x00ff));
-		d = d * 2 + 5;
-		break;
-	}
-	case 15:{d = 8;break;}
-	case 16:{d = 8;break;}
-	}
-	return d;
-}
 
-/*MBAP头的判断*/
-bool SystemChange::MBAPhead_Juage(uint8_t* Rdata, int Rlen)
-{
-	if (((uint16_t)Rdata[2]) | ((uint16_t)Rdata[3]) != 0)
-	{
-		cout << "协议标识错误" << endl;
-		return false;
-	}
-	uint16_t d = ((((uint16_t)Rdata[4]) << 8) | ((uint16_t)Rdata[5]));
-	if (Rlen - 6 != d)
-	{
-		cout << "字节数错误" << endl;
-		return false;
-	}
-	if (Rdata[6] != AddRess)
-	{
-		cout << "单元标识符错误" << endl;
-		return false;
-	}
-	return true;
-}
-
-/*异常码生成*/
-void SystemChange::DataEorry(uint8_t* &Rdata, int* Rlen, uint16_t code, uint16_t function)
-{
-	int Retlen = 0;
-	function += 0x80;
-	Rdata[7] = function;
-	Rdata[8] = code & 0xff;
-	Retlen = 9;
-	memset(Rdata + 9, 0, *Rlen - 9);
-	*Rlen = Retlen;
-	return;
-}
