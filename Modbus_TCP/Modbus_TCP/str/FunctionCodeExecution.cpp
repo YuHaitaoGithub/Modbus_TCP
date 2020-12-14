@@ -160,7 +160,7 @@ void DataJuage(uint8_t* Rdata, int* Rlen)
 		if (function == 15 || function == 16)
 		{
 			Bytenum = (*Rlen) == 12 ? 0 : Rdata[12] & 0xff;
-			int m = number % 8 == 0 ? number / 8 : number / 8 + 1;
+			int m = (number + 7) / 8;
 			if (15 == function)
 			{
 				if (number > 1968 || number < 1 || Bytenum != (*Rlen) - 13 || Bytenum == 0 || m != Bytenum)

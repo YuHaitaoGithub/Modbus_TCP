@@ -8,7 +8,7 @@
 #include "malloc.h"
 #include <iostream>
 
-#define AddRess 0xff
+#define AddRess 0x01
 
 
 using namespace std;
