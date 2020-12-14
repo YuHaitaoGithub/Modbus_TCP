@@ -66,8 +66,7 @@ uint16_t MBAPheadJuage::ChangeNum(uint8_t* str)
 			num[i] = str[i] - 'a' + 10;
 		else if ((str[i] >= 'A') && (str[i] <= 'F'))
 			num[i] = str[i] - 'A' + 10;
-		else
-			num[i] = 0;
+		
 		result = result + num[i] * count;
 		count = count * 16;//十六进制(如果是八进制就在这里乘以8)    
 	}

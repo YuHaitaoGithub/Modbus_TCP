@@ -11,14 +11,19 @@
 #include <time.h>
 #include <math.h>
 
-//#define CoilFilename  "./Coil.ini"
-#define CoilFilename  "E:\\Modbus agreement\\TCP_Slave\\Modbus_TCP\\Modbus_TCP\\Coil.ini"
+#define CoilFilename  "./Coil.ini"
 #define CoilSection   "Coil"
 
-//#define ResFilename   "./Register.ini"
-#define ResFilename   "E:\\Modbus agreement\\TCP_Slave\\Modbus_TCP\\Modbus_TCP\\Register.ini"
+#define ResFilename   "./Register.ini"
 #define ResSection    "register"
 
+#ifdef CoilFilename  "./Coil.ini"
+#define CoilFilename  "..\\Modbus_TCP\\Coil.ini"
+#endif
+
+#ifdef  ResFilename   "./Register.ini"
+#define ResFilename   "..\\Modbus_TCP\\Register.ini"
+#endif
 
 #pragma comment(lib,"ws2_32.lib")
 

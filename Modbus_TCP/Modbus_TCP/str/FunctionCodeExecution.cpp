@@ -30,6 +30,7 @@ void Coilrw(uint8_t* in_num,int* retlen, uint8_t* Rdata)
 				char k[10] = {};
 				_itoa_s(i, k, 10);
 				num = GetPrivateProfileIntA(CoilSection, k, -1, CoilFilename);
+				char *pp = CoilFilename;
 				in_num[*retlen] = ((0xff & num) << (j)) | in_num[*retlen];
 			}
 			*retlen = *retlen + 1;

@@ -1,6 +1,10 @@
 #include "stdafx.h"
 
 
+
+
+
+
 namespace UnitTest
 {		
 	TEST_CLASS(UnitTest1)

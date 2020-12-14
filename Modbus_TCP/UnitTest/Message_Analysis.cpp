@@ -1,5 +1,6 @@
 #include"stdafx.h"
 
+
 #define filename  "..\\Modbus_TCP\\test\\TCPTest.ini"
 #define MAX_LINE 1024
 #define receive  "RequestMessage"

@@ -12,6 +12,10 @@
 #include"..\\Modbus_TCP\\include\\MBAPjuage.h"
 #include"..\\Modbus_TCP\\include\\main.h"
 #include <winsock2.h>
+
+
+
+
 // TODO:  在此处引用程序需要的其他头文件
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
