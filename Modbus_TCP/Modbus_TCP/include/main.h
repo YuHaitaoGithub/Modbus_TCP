@@ -11,19 +11,6 @@
 #include <time.h>
 #include <math.h>
 
-//#define CoilFilename  "./Coil.ini"
-//#define CoilSection   "Coil"
-//
-//#define ResFilename   "./Register.ini"
-//#define ResSection    "register"
-//
-//#ifdef CoilFilename  "./Coil.ini"
-//#define CoilFilename  "..\\Modbus_TCP\\Coil.ini"
-//#endif
-//
-//#ifdef  ResFilename   "./Register.ini"
-//#define ResFilename   "..\\Modbus_TCP\\Register.ini"
-//#endif
 
 #define CoilNum_Max   2500
 #define RestNum_Max   250
