@@ -5,13 +5,13 @@
 int main()
 {
 	/*初始化线圈和寄存器*/
-	for (int m = 0; m < 2500; m++)
+	for (int m = 0; m < CoilNum_Max; m++)
 	{
 		char u[10] = {};
 		_itoa_s(m, u, 10);
 		WritePrivateProfileStringA(CoilSection, u, "0", CoilFilename);
 	}
-	for (int m = 0; m < 250; m++)
+	for (int m = 0; m < RestNum_Max; m++)
 	{
 		char u[10] = {};
 		_itoa_s(m, u, 10);

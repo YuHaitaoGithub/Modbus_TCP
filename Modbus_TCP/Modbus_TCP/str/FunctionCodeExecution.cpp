@@ -128,7 +128,7 @@ void DataJuage(uint8_t* Rdata, int* Rlen)
 					numJuage.DataEorry(Rdata, Rlen, code, function);
 					return;
 				}
-				if (number + address > 2500)
+				if (number + address > CoilNum_Max)
 				{
 					cout << "非法数据地址,返回异常码02" << endl;
 					code = 2;
@@ -146,7 +146,7 @@ void DataJuage(uint8_t* Rdata, int* Rlen)
 				numJuage.DataEorry(Rdata, Rlen, code, function);
 				return;
 			}
-			if (number + address > 250)
+			if (number + address > RestNum_Max)
 			{
 				cout << "非法数据地址,返回异常码02" << endl;
 				code = 2;
@@ -170,7 +170,7 @@ void DataJuage(uint8_t* Rdata, int* Rlen)
 					numJuage.DataEorry(Rdata, Rlen, code, function);
 					return;
 				}
-				if (number + address > 2500)
+				if (number + address > CoilNum_Max)
 				{
 					cout << "非法数据地址,返回异常码02" << endl;
 					code = 2;
@@ -189,7 +189,7 @@ void DataJuage(uint8_t* Rdata, int* Rlen)
 				numJuage.DataEorry(Rdata, Rlen, code, function);
 				return;
 			}
-			if (number + address > 250)
+			if (number + address > RestNum_Max)
 			{
 				cout << "非法数据地址,返回异常码02" << endl;
 				code = 2;

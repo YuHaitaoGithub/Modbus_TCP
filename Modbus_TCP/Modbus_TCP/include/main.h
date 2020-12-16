@@ -25,6 +25,9 @@
 #define ResFilename   "..\\Modbus_TCP\\Register.ini"
 #endif
 
+#define CoilNum_Max   2500
+#define RestNum_Max   250
+
 #pragma comment(lib,"ws2_32.lib")
 
 using namespace std;
