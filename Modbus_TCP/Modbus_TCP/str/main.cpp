@@ -5,19 +5,8 @@
 int main()
 {
 	/*初始化线圈和寄存器*/
-	for (int m = 0; m < CoilNum_Max; m++)
-	{
-		char u[10] = {};
-		_itoa_s(m, u, 10);
-		WritePrivateProfileStringA(CoilSection, u, "0", CoilFilename);
-	}
-	for (int m = 0; m < RestNum_Max; m++)
-	{
-		char u[10] = {};
-		_itoa_s(m, u, 10);
-		WritePrivateProfileStringA(ResSection, u, "0", ResFilename);
-	}
-
+	uint8_t loadcoil[CoilNum_Max] = {};
+	uint8_t loadRest[RestNum_Max] = {};
 
 
 	//初始化WSA
@@ -130,7 +119,7 @@ int main()
 				uint8_t Coil[1024] = {};
 				memcpy(Coil, revData, 12);
 
-				Coilrw(Coil, &retlen, revData);
+				Coilrw(Coil, &retlen, revData, loadcoil);
 				//更改字节数
 				Coil[4] = ((retlen - 6) >> 8) & 0xff;
 				Coil[5] = (retlen - 6) & 0xff;
@@ -154,7 +143,7 @@ int main()
 				uint8_t Register[1024] = {};
 				memcpy(Register, revData, 12);
 
-				Regist(Register, &retlen, revData);
+				Regist(Register, &retlen, revData, loadRest);
 
 				//更改字节数
 				Register[4] = ((retlen - 6) >> 8) & 0xff;

@@ -63,6 +63,8 @@ void DataRead(char *section, unsigned char *lpRecevebuffer, unsigned char *outbu
 
 void DataTest()
 {
+	uint8_t loadcoil[2500] = {};
+	uint8_t loadRest[250] = {};
 	char section1[MAX_LINE] = { '\0' };//section1--该文件下所有节名保存数组
 	int a = 0;
 	GetPrivateProfileSectionNamesA(section1, MAX_LINE, filename);
@@ -100,7 +102,7 @@ void DataTest()
 					uint8_t Coil[1024] = {};
 					memcpy(Coil, Recevebuffer, 12);
 
-					Coilrw(Coil, &retlen, Recevebuffer);
+					Coilrw(Coil, &retlen, Recevebuffer, loadcoil);
 					Coil[4] = ((retlen - 6) >> 8) & 0xff;
 					Coil[5] = (retlen - 6) & 0xff;
 					//发送
@@ -112,7 +114,7 @@ void DataTest()
 				{
 					uint8_t Register[1024] = {};
 					memcpy(Register, Recevebuffer, 12);
-					Regist(Register, &retlen, Recevebuffer);
+					Regist(Register, &retlen, Recevebuffer, loadRest);
 
 					Register[4] = ((retlen - 6) >> 8) & 0xff;
 					Register[5] = (retlen - 6) & 0xff;

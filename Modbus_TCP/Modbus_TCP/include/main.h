@@ -11,19 +11,19 @@
 #include <time.h>
 #include <math.h>
 
-#define CoilFilename  "./Coil.ini"
-#define CoilSection   "Coil"
-
-#define ResFilename   "./Register.ini"
-#define ResSection    "register"
-
-#ifdef CoilFilename  "./Coil.ini"
-#define CoilFilename  "..\\Modbus_TCP\\Coil.ini"
-#endif
-
-#ifdef  ResFilename   "./Register.ini"
-#define ResFilename   "..\\Modbus_TCP\\Register.ini"
-#endif
+//#define CoilFilename  "./Coil.ini"
+//#define CoilSection   "Coil"
+//
+//#define ResFilename   "./Register.ini"
+//#define ResSection    "register"
+//
+//#ifdef CoilFilename  "./Coil.ini"
+//#define CoilFilename  "..\\Modbus_TCP\\Coil.ini"
+//#endif
+//
+//#ifdef  ResFilename   "./Register.ini"
+//#define ResFilename   "..\\Modbus_TCP\\Register.ini"
+//#endif
 
 #define CoilNum_Max   2500
 #define RestNum_Max   250
@@ -33,8 +33,8 @@
 using namespace std;
 
 
-void Coilrw(uint8_t* in_num,int* retlen, uint8_t* Rdata);
+void Coilrw(uint8_t* in_num, int* retlen, uint8_t* Rdata, uint8_t *lpcoil);
 
-void Regist(uint8_t* ret_num, int* retlenth, uint8_t* Reivedata);
+void Regist(uint8_t* ret_num, int* retlenth, uint8_t* Reivedata, uint8_t *lprest);
 
 void DataJuage(uint8_t* Rdata, int* Rlen);

@@ -3,7 +3,7 @@
 
 
 /*线圈返回帧的生成*/
-void Coilrw(uint8_t* in_num,int* retlen, uint8_t* Rdata)
+void Coilrw(uint8_t* in_num,int* retlen, uint8_t* Rdata,uint8_t *lpcoil)
 {
 	int functionCode = in_num[7] & 0xff;//功能码
 	int StrAddress = ((in_num[8] & 0xff) << 8) | (in_num[9] & 0xff);//起始地址
@@ -27,11 +27,7 @@ void Coilrw(uint8_t* in_num,int* retlen, uint8_t* Rdata)
 			for (int i = StrAddress; j < 8 && RstNum; i++, j++)
 			{
 				RstNum--;
-				char k[10] = {};
-				_itoa_s(i, k, 10);
-				num = GetPrivateProfileIntA(CoilSection, k, -1, CoilFilename);
-				char *pp = CoilFilename;
-				in_num[*retlen] = ((0xff & num) << (j)) | in_num[*retlen];
+				in_num[*retlen] = ((0xff & lpcoil[i]) << (j)) | in_num[*retlen];
 			}
 			*retlen = *retlen + 1;
 			if (!RstNum)break;
@@ -44,12 +40,7 @@ void Coilrw(uint8_t* in_num,int* retlen, uint8_t* Rdata)
 			for (int i = StrAddress; j < 8 && RstNum; i++, j++)
 			{
 				RstNum--;
-				num = (Rdata[len] >> j) & 0x01;
-				char k1[10] = {};
-				char k2[10] = {};
-				_itoa_s(i, k1, 10);
-				_itoa_s(num, k2, 10);
-				WritePrivateProfileStringA(CoilSection, k1, k2, CoilFilename);
+				lpcoil[i] = (Rdata[len] >> j) & 0x01;
 			}
 			++len;
 			if (!RstNum)break;
@@ -62,7 +53,7 @@ void Coilrw(uint8_t* in_num,int* retlen, uint8_t* Rdata)
 
 
 /*寄存器的读写*/
-void Regist(uint8_t* ret_num, int* retlenth, uint8_t* Reivedata)
+void Regist(uint8_t* ret_num, int* retlenth, uint8_t* Reivedata,uint8_t *lprest)
 {
 	int functionCode = ret_num[7] & 0xff;
 	int StrAddress = ((ret_num[8] & 0xff) << 8) | (ret_num[9] & 0xff);
@@ -77,25 +68,16 @@ void Regist(uint8_t* ret_num, int* retlenth, uint8_t* Reivedata)
 		*retlenth = 9;
 		for (int i = StrAddress; i < RstNum + StrAddress; i++, *retlenth = (*retlenth) + 2)
 		{
-			char k[10] = {};
-			_itoa_s(i, k, 10);
-			num = GetPrivateProfileIntA(ResSection, k, -1, ResFilename);
-			ret_num[*retlenth] = (0xff & (num >> 8));
-			ret_num[(*retlenth) + 1] = 0xff & num;
+			ret_num[*retlenth] = (0xff & (lprest[i] >> 8));
+			ret_num[(*retlenth) + 1] = 0xff & lprest[i];
 		}
 	}
 	/*16功能码*/
 	else{
 		int len = *retlenth + 1;
 		for (int i = StrAddress; i < RstNum + StrAddress; i++, len = len + 2)
-		{
-			num = ((Reivedata[len] & 0xff)<<8) | (Reivedata[len+1]&0xff);
-			char k1[10] = {};
-			char k2[10] = {};
-			_itoa_s(i, k1, 10);
-			_itoa_s(num, k2, 10);
-			WritePrivateProfileStringA(ResSection, k1, k2, ResFilename);
-		}
+			lprest[i] = ((Reivedata[len] & 0xff) << 8) | (Reivedata[len + 1] & 0xff);
+		
 	}
 	return;
 }
