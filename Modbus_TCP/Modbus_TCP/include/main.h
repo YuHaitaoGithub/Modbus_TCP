@@ -15,6 +15,8 @@
 #define CoilNum_Max   2500
 #define RestNum_Max   250
 
+#define Portnum       502
+
 #pragma comment(lib,"ws2_32.lib")
 
 using namespace std;
