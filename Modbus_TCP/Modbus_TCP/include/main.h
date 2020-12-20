@@ -27,3 +27,4 @@ void Coilrw(uint8_t* in_num, int* retlen, uint8_t* Rdata, uint8_t *lpcoil);
 void Regist(uint8_t* ret_num, int* retlenth, uint8_t* Reivedata, uint8_t *lprest);
 
 void DataJuage(uint8_t* Rdata, int* Rlen);
+
