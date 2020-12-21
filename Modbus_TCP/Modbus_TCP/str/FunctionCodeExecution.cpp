@@ -82,6 +82,10 @@ void Regist(uint8_t* ret_num, int* retlenth, uint8_t* Reivedata,uint8_t *lprest)
 	return;
 }
 
+
+
+
+
 void DataJuage_01(uint8_t **lpRdata, int **lpRlen, MBAPheadJuage *lpnumJuage, uint16_t fucn,int number,int address)
 {
 	int code = 0;
@@ -101,6 +105,9 @@ void DataJuage_01(uint8_t **lpRdata, int **lpRlen, MBAPheadJuage *lpnumJuage, ui
 	}
 	return;
 }
+
+
+
 
 void DataJuage_03(uint8_t **lpRdata, int **lpRlen, MBAPheadJuage *lpnumJuage, uint16_t fucn, int number, int address)
 {
@@ -122,6 +129,9 @@ void DataJuage_03(uint8_t **lpRdata, int **lpRlen, MBAPheadJuage *lpnumJuage, ui
 	return;
 }
 
+
+
+
 void DataJuage_15(uint8_t **lpRdata, int **lpRlen, MBAPheadJuage *lpnumJuage, uint16_t fucn, int number, int address, int Bytenum,int m)
 {
 	int code = 0;
@@ -141,6 +151,8 @@ void DataJuage_15(uint8_t **lpRdata, int **lpRlen, MBAPheadJuage *lpnumJuage, ui
 	}
 	return;
 }
+
+
 
 
 void DataJuage_16(uint8_t **lpRdata, int **lpRlen, MBAPheadJuage *lpnumJuage, uint16_t fucn, int number, int address, int Bytenum, int m)
@@ -191,7 +203,7 @@ void DataJuage(uint8_t* Rdata, int* Rlen)
 			DataJuage_03(&Rdata, &Rlen, &numJuage, function, number, address);
 			return;
 		}
-		
+		/*15功能码数据范围判断*/
 		Bytenum = (*Rlen) == 12 ? 0 : Rdata[12] & 0xff;
 		int m = 0;
 		if (15 == function)
